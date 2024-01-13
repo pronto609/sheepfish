@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,8 +20,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('test', function () {
+    return view('test');
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::middleware('guest')->group(function () {
+    Route::resource('employees', EmployeeController::class)->missing(function (Request $request) {
+        return Redirect::route('employees.index');
+    });
+    Route::resource('companies', CompanyController::class)->missing(function (Request $request) {
+        return Redirect::route('companies.index');
+    });
+});
+
 
 require __DIR__.'/auth.php';

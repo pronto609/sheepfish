@@ -20,7 +20,7 @@ Route::get('/', function () {
     return Redirect::route('login');
 });
 
-Route::middleware('guest')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::resource('employees', EmployeeController::class)->missing(function (Request $request) {
         return Redirect::route('employees.index');
     });

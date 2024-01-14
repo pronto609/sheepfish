@@ -12,6 +12,8 @@ class Company extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = ['name', 'email', 'logo', 'website'];
+
     public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);

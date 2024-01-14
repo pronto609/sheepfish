@@ -13,7 +13,7 @@ class CompanyRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +23,11 @@ class CompanyRequest extends FormRequest
      */
     public function rules()
     {
+        $unique = $this->is('companies.store') ? '|unique:companies' : '';
         return [
-            //
+            'name' => 'required|max:255'.$unique,
+            'email' => 'email|max:255',
+            'logo' => 'image||dimensions:min_width=100,min_height=100'
         ];
     }
 }

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
 
 class CompanyController extends Controller
 {
@@ -33,10 +37,10 @@ class CompanyController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CompanyRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CompanyRequest $request)
     {
         //
     }
@@ -69,13 +73,30 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CompanyRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function update(Request $request, $id)
+    public function update(CompanyRequest $request, Company $company)
     {
-        //
+        $input = $request->except('_token', '_method');
+        $file = $request->file('logo');
+        if ($file) {
+            $input['logo'] = $this->filePrepare($file, $company);
+        }
+        $company->fill($input)->save();
+        $request->session()->flash('success', sprintf('Company id: %d updated successfully', $company->id));
+        return redirect()->route('companies.index');
+    }
+
+    private function filePrepare(UploadedFile $file, Company $company)
+    {
+        $filename = Str::uuid() . "_" .$file->getClientOriginalName();
+        Storage::disk('local')->put('public/'.$filename, file_get_contents($file));
+        if ('logo.png' !== $file->getClientOriginalName()) {
+            Storage::disk('local')->delete('public/' . $company->logo);
+        }
+        return $filename;
     }
 
     /**

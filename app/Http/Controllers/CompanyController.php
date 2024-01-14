@@ -27,33 +27,43 @@ class CompanyController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     public function create()
     {
-        //
+        $title = $formName = sprintf('Create new company');
+
+        return view('app.companies.edit', compact(['title', 'formName']));
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  CompanyRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function store(CompanyRequest $request)
     {
-        //
+        $input = $request->except('_token', '_method');
+        $file = $request->file('logo');
+        if ($file) {
+            $input['logo'] = $this->filePrepare($file);
+        }
+        $company = Company::create($input);
+        $request->session()->flash('success', sprintf('Company id: %d updated successfully', $company->id));
+        return redirect()->route('companies.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Company  $company
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function show($id)
+    public function show(Company $company)
     {
-        //
+        $title = sprintf('Show company name: %s', $company->name);
+        return view('app.companies.show', compact(['title', 'company']));
     }
 
     /**
@@ -74,7 +84,7 @@ class CompanyController extends Controller
      * Update the specified resource in storage.
      *
      * @param  CompanyRequest  $request
-     * @param  int  $id
+     * @param  Company  $company
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function update(CompanyRequest $request, Company $company)
@@ -89,11 +99,11 @@ class CompanyController extends Controller
         return redirect()->route('companies.index');
     }
 
-    private function filePrepare(UploadedFile $file, Company $company)
+    private function filePrepare(UploadedFile $file, Company $company = null)
     {
         $filename = Str::uuid() . "_" .$file->getClientOriginalName();
         Storage::disk('local')->put('public/'.$filename, file_get_contents($file));
-        if ('logo.png' !== $file->getClientOriginalName()) {
+        if ('logo.png' !== $file->getClientOriginalName() && $company) {
             Storage::disk('local')->delete('public/' . $company->logo);
         }
         return $filename;

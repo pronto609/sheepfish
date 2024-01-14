@@ -12,14 +12,14 @@
 </head>
 <body>
     @include('app.navigation')
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    @if(Session::has('success'))
+        <p class="alert alert-success">{{ Session::get('success') }}</p>
+    @endif
+    @if(Session::has('warning'))
+        <p class="alert alert-warning">{{ Session::get('warning') }}</p>
+    @endif
+    @if(Session::has('danger'))
+        <p class="alert alert-danger">{{ Session::get('danger') }}</p>
     @endif
 
     @yield('content')

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
@@ -9,11 +11,13 @@ class CompanyController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     public function index()
     {
-        //
+        $title = 'Companies';
+        $companies = Company::paginate(10);
+        return view('app.companies.index', compact( 'title', 'companies'));
     }
 
     /**
@@ -52,11 +56,14 @@ class CompanyController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     public function edit($id)
     {
-        //
+        $company = Company::findOrFail($id);
+        $title = $formName = sprintf('Edit company name: %s', $company->name);
+
+        return view('app.companies.edit', compact(['title', 'company', 'formName']));
     }
 
     /**
@@ -75,10 +82,14 @@ class CompanyController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        /** @var Company $company */
+        $company = Company::findOrFail($id);
+        $company->delete();
+        $request->session()->flash('success', sprintf('Company id:%d successfully deleted', $id));
+        return redirect()->route('companies.index');
     }
 }

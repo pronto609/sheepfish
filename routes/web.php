@@ -17,16 +17,8 @@ use Illuminate\Support\Facades\Redirect;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return Redirect::route('login');
 });
-
-Route::get('test', function () {
-    return view('test');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('guest')->group(function () {
     Route::resource('employees', EmployeeController::class)->missing(function (Request $request) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmployeeRequest;
 use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Http\Request;
@@ -35,12 +36,19 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\EmployeeRequest  $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function store(Request $request)
+    public function store(EmployeeRequest $request)
     {
-        //
+        $input = $request->except('_token', '_method');
+        $file = $request->file('logo');
+        if ($file) {
+            $input['logo'] = $this->filePrepare($file);
+        }
+        $company = Company::create($input);
+        $request->session()->flash('success', sprintf('Company id: %d updated successfully', $company->id));
+        return redirect()->route('companies.index');
     }
 
     /**

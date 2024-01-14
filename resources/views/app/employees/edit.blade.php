@@ -4,12 +4,12 @@
     <div class="container">
         <h2>{{ $formName }}</h2>
         <form method="POST"
-              action='
+              action=
                       @if(isset($employee))
                         "{{ route('employees.update', ['employee' => $employee->id]) }}"
             @else
                 "{{ route('employees.store') }}"
-            @endif'
+            @endif
         >
             @csrf
             @if(isset($employee))
@@ -93,7 +93,3 @@
         </form>
     </div>
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('js/select.js')}}"></script>
-@endpush

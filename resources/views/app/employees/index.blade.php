@@ -22,9 +22,13 @@
                         <a href="{{ route('employees.show', ['employee' => $employee->id]) }}">{{ $employee->first_name }} {{ $employee->last_name }}</a>
                     </td>
                     <td>
+                        @if($employee->company)
                         <a href="{{ route('companies.show', ['company' => $employee->company->id]) }}">
                             {{ $employee->company->name }}
                         </a>
+                        @else
+                            none company
+                        @endif
                     </td>
                     <td>{{ $employee->email }}</td>
                     <td>{{ $employee->phone }}</td>

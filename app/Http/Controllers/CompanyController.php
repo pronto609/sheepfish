@@ -69,12 +69,11 @@ class CompanyController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  Company  $company
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function edit($id)
+    public function edit(Company $company)
     {
-        $company = Company::findOrFail($id);
         $title = $formName = sprintf('Edit company name: %s', $company->name);
 
         return view('app.companies.edit', compact(['title', 'company', 'formName']));
@@ -112,15 +111,13 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  Company $company
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function destroy($id, Request $request)
+    public function destroy(Company $company, Request $request)
     {
-        /** @var Company $company */
-        $company = Company::findOrFail($id);
         $company->delete();
-        $request->session()->flash('success', sprintf('Company id:%d successfully deleted', $id));
+        $request->session()->flash('success', sprintf('Company id:%d successfully deleted', $company->id));
         return redirect()->route('companies.index');
     }
 }

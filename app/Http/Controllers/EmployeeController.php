@@ -17,7 +17,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $title = 'Employees';
-        $employees = Employee::paginate(10);
+        $employees = Employee::with(['company'])->paginate(10);
         return view('app.employees.index', compact( 'title', 'employees'));
     }
 
@@ -42,57 +42,62 @@ class EmployeeController extends Controller
     public function store(EmployeeRequest $request)
     {
         $input = $request->except('_token', '_method');
-        $file = $request->file('logo');
-        if ($file) {
-            $input['logo'] = $this->filePrepare($file);
-        }
-        $company = Company::create($input);
-        $request->session()->flash('success', sprintf('Company id: %d updated successfully', $company->id));
-        return redirect()->route('companies.index');
+        $employee = Employee::create($input);
+        $request->session()->flash('success', sprintf('Employee id: %d created successfully', $employee->id));
+        return redirect()->route('employees.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Employee  $employee
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function show($id)
+    public function show(Employee $employee)
     {
-        //
+        $title = sprintf('Show employee name: %s', $employee->name);
+        return view('app.employees.show', compact(['title', 'employee']));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Employee  $employee
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function edit($id)
+    public function edit(Employee $employee)
     {
-        //
+        $title = $formName = sprintf('Edit employee name: %s', $employee->name);
+        $companies = Company::all();
+        return view('app.employees.edit', compact(['title', 'employee', 'companies', 'formName']));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param \App\Http\Requests\EmployeeRequest  $request
+     * @param  Employee  $employee
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Employee $employee)
     {
-        //
+        $input = $request->except('_token', '_method');
+
+        $employee->fill($input)->save();
+        $request->session()->flash('success', sprintf('Employee with id: %d updated successfully', $employee->id));
+        return redirect()->route('employees.show', ['employee' => $employee->id]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Employee  $employee
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function destroy($id)
+    public function destroy(Employee $employee, Request $request)
     {
-        //
+        $employee->delete();
+        $request->session()->flash('success', sprintf('Company id:%d successfully deleted', $employee->id));
+        return redirect()->route('employees.index');
     }
 }

@@ -27,7 +27,6 @@ class EmployeeRequest extends FormRequest
             'first_name'=>'required|max:255',
             'last_name'=>'required|max:255',
             'email'=>'email|max:255',
-            'phone'=>'phone',
         ];
     }
 }

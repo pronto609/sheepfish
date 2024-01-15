@@ -1,15 +1,15 @@
 @extends('layouts.main')
 
 @section('content')
-    @if($company)
+    @if($employee)
         <div class="container">
-            <img class="card-img-top" src="{{ asset('storage/'.$company->logo) }}" width="200px" alt="Card image cap">
             <div class="card-body">
-                <h5 class="card-title">{{ $company->name }}</h5>
+                <h5 class="card-title">{{ $employee->first_name }} {{ $employee->last_name }}</h5>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Email: {{ $company->email }}</li>
-                <li class="list-group-item">Website: {{ $company->website }}</li>
+                <li class="list-group-item">Email: {{ $employee->email }}</li>
+                <li class="list-group-item">Phone: {{ $employee->phone }}</li>
+                <li class="list-group-item">Company: {{ $employee->company->name }}</li>
             </ul>
         </div>
     @endif
